@@ -1,0 +1,3 @@
+/mnt/c/Users/MSI/Desktop/churn-bigml-80.csv
+/mnt/c/Users/MSI/Desktop/churn-bigml-20.csv
+Churn
