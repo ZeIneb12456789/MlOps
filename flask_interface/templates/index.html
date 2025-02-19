@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Churn Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 750px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .form-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        input {
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4ca1af;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        input[type="submit"] {
+            background: #4ca1af;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease;
+            grid-column: span 3;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        input[type="submit"]:hover {
+            background: #3b8991;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .modal-content button {
+            background: #4ca1af;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s ease;
+        }
+
+        .modal-content button:hover {
+            background: #3b8991;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔍 Churn Prediction Form</h2>
+        <form method="post" class="form-container">
+            <div class="form-group"><label for="State">State:</label><input type="text" id="State" name="State" required></div>
+            <div class="form-group"><label for="Account_length">Account Length:</label><input type="number" id="Account_length" name="Account_length" required></div>
+            <div class="form-group"><label for="Area_code">Area Code:</label><input type="number" id="Area_code" name="Area_code" required></div>
+            <div class="form-group"><label for="International_plan">International Plan:</label><input type="text" id="International_plan" name="International_plan" required></div>
+            <div class="form-group"><label for="Voice_mail_plan">Voice Mail Plan:</label><input type="text" id="Voice_mail_plan" name="Voice_mail_plan" required></div>
+            <div class="form-group"><label for="Number_vmail_messages">Voicemail Messages:</label><input type="number" id="Number_vmail_messages" name="Number_vmail_messages" required></div>
+            <div class="form-group"><label for="Total_day_minutes">Day Minutes:</label><input type="number" step="any" id="Total_day_minutes" name="Total_day_minutes" required></div>
+            <div class="form-group"><label for="Total_day_calls">Day Calls:</label><input type="number" id="Total_day_calls" name="Total_day_calls" required></div>
+            <div class="form-group"><label for="Total_day_charge">Day Charge:</label><input type="number" step="any" id="Total_day_charge" name="Total_day_charge" required></div>
+            <div class="form-group"><label for="Total_eve_minutes">Evening Minutes:</label><input type="number" step="any" id="Total_eve_minutes" name="Total_eve_minutes" required></div>
+            <div class="form-group"><label for="Total_eve_calls">Evening Calls:</label><input type="number" id="Total_eve_calls" name="Total_eve_calls" required></div>
+            <div class="form-group"><label for="Total_eve_charge">Evening Charge:</label><input type="number" step="any" id="Total_eve_charge" name="Total_eve_charge" required></div>
+            <div class="form-group"><label for="Total_night_minutes">Night Minutes:</label><input type="number" step="any" id="Total_night_minutes" name="Total_night_minutes" required></div>
+            <div class="form-group"><label for="Total_night_calls">Night Calls:</label><input type="number" id="Total_night_calls" name="Total_night_calls" required></div>
+            <div class="form-group"><label for="Total_night_charge">Night Charge:</label><input type="number" step="any" id="Total_night_charge" name="Total_night_charge" required></div>
+            <div class="form-group"><label for="Total_intl_minutes">Intl Minutes:</label><input type="number" step="any" id="Total_intl_minutes" name="Total_intl_minutes" required></div>
+            <div class="form-group"><label for="Total_intl_calls">Intl Calls:</label><input type="number" id="Total_intl_calls" name="Total_intl_calls" required></div>
+            <div class="form-group"><label for="Total_intl_charge">Intl Charge:</label><input type="number" step="any" id="Total_intl_charge" name="Total_intl_charge" required></div>
+            <div class="form-group"><label for="Customer_service_calls">Customer Service Calls:</label><input type="number" id="Customer_service_calls" name="Customer_service_calls" required></div>
+            <input type="submit" value="🔮 Predict">
+        </form>
+    </div>
+
+    <!-- Modal for Prediction -->
+    <div id="predictionModal" class="modal">
+        <div class="modal-content">
+            <h3>🔔 Prediction: {{ prediction }}</h3>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to open the modal
+        function openModal() {
+            document.getElementById('predictionModal').style.display = 'flex';
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById('predictionModal').style.display = 'none';
+        }
+
+        // Automatically open the modal if there's a prediction
+        {% if prediction is not none %}
+            openModal();
+        {% endif %}
+    </script>
+</body>
+</html>
