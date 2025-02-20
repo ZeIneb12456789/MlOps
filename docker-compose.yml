@@ -1,0 +1,29 @@
+version: "3.9"  # or the version you're using
+
+services:
+  model_service:
+    build: ./model_service
+    container_name: model_service
+    ports:
+      - "5000:5000"  # Exposes port 5000 on host, change if required
+    networks:
+      - ml_network
+    environment:
+      - FLASK_ENV=production
+
+  flask_interface:
+    build: ./flask_interface
+    container_name: flask_interface
+    ports:
+      - "8008:8000"  # Changed port to 8081 to avoid conflicts with port 8000
+    depends_on:
+      - model_service
+    networks:
+      - ml_network
+    environment:
+      - FLASK_ENV=production
+
+networks:
+  ml_network:
+    driver: bridge
+
