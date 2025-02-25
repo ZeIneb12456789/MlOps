@@ -16,6 +16,8 @@ from model_pipeline import (
 )
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
+import psutil
+import time
 
 # Default file paths and target column
 DEFAULT_TRAIN_FILE = "/mnt/c/Users/MSI/Desktop/churn-bigml-80.csv"
@@ -25,6 +27,50 @@ DEFAULT_MODEL_FILE = "trained_model.joblib"
 DEFAULT_ENCODER_FILE = "encoders.pkl"
 DEFAULT_DATA_FILE = "prepared_data.pkl"  # File for saving preprocessed data
 mlflow.set_tracking_uri("http://localhost:5000")
+
+def log_system_metrics(start_time, initial_cpu, initial_memory):
+    """Helper function to log system metrics to MLflow."""
+    # Log system metrics during model training
+    final_cpu = psutil.cpu_percent(interval=1)
+    final_memory = psutil.virtual_memory().percent
+
+    # Log system metrics to MLflow
+    mlflow.log_metric("initial_cpu_usage", initial_cpu)
+    mlflow.log_metric("initial_memory_usage", initial_memory)
+    mlflow.log_metric("final_cpu_usage", final_cpu)
+    mlflow.log_metric("final_memory_usage", final_memory)
+
+    # Log training time
+    training_time = time.time() - start_time
+    mlflow.log_metric("training_time_seconds", training_time)
+    
+    print(f"Training Time: {training_time} seconds")
+    print(f"CPU Usage During Training: {initial_cpu} -> {final_cpu}")
+    print(f"Memory Usage During Training: {initial_memory} -> {final_memory}")
+
+    return training_time, final_cpu, final_memory
+
+
+def log_inference_metrics(model, X_test):
+    """Helper function to log inference time and system metrics."""
+    # Log inference time
+    inference_start = time.time()
+    model.predict(X_test)
+    inference_time = time.time() - inference_start
+    mlflow.log_metric("inference_time_seconds", inference_time)
+
+    # Log system metrics after inference
+    final_cpu_inference = psutil.cpu_percent(interval=1)
+    final_memory_inference = psutil.virtual_memory().percent
+
+    mlflow.log_metric("final_cpu_usage_inference", final_cpu_inference)
+    mlflow.log_metric("final_memory_usage_inference", final_memory_inference)
+
+    print(f"Inference Time: {inference_time} seconds")
+    print(f"CPU Usage After Inference: {final_cpu_inference}")
+    print(f"Memory Usage After Inference: {final_memory_inference}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Machine Learning Model Pipeline")
     parser.add_argument(
@@ -104,8 +150,16 @@ def main():
             mlflow.log_param("random_state", model.random_state)
             print("✅ Parameters logged successfully.")
 
+            # Log initial system metrics before training
+            initial_cpu = psutil.cpu_percent(interval=1)
+            initial_memory = psutil.virtual_memory().percent
+            start_time = time.time()
+
             # Train the model
             model = train_model(model, X_train, y_train)
+
+            # Log system metrics and training time
+            training_time, final_cpu, final_memory = log_system_metrics(start_time, initial_cpu, initial_memory)
 
             save_model(model, args.model_file)
 
@@ -156,6 +210,9 @@ def main():
             mlflow.log_metric("recall_False", report["False"]["recall"])
             mlflow.log_metric("f1_False", report["False"]["f1-score"])
             print("✅ Metrics logged successfully.")
+
+            # Log inference metrics
+            log_inference_metrics(model, X_test)
 
             print("✅ Evaluation complete. Metrics logged in MLflow.")
 
