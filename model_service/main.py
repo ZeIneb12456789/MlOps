@@ -30,7 +30,6 @@ mlflow.set_tracking_uri("http://localhost:5000")
 
 def log_system_metrics(start_time, initial_cpu, initial_memory):
     """Helper function to log system metrics to MLflow."""
-    # Log system metrics during model training
     final_cpu = psutil.cpu_percent(interval=1)
     final_memory = psutil.virtual_memory().percent
 
@@ -144,7 +143,7 @@ def main():
             
             model = RandomForestClassifier(n_estimators=100, random_state=42)
 
-            # ✅ Explicitly log parameters BEFORE training
+            # Log parameters
             print("🔹 Logging parameters to MLflow...")
             mlflow.log_param("n_estimators", model.n_estimators)
             mlflow.log_param("random_state", model.random_state)
@@ -169,7 +168,7 @@ def main():
             # Infer model signature with data converted to float
             signature = infer_signature(X_train.astype(float), model.predict(X_train))
 
-            # ✅ Log the model with MLflow
+            # Log the model with MLflow
             mlflow.sklearn.log_model(
                 model,
                 "random_forest_model",
@@ -177,7 +176,11 @@ def main():
                 signature=signature
             )
 
-            print("✅ Model training complete. Model saved.")
+            # Register the model in the MLflow Model Registry
+            model_uri = f"runs:/{run.info.run_id}/random_forest_model"
+            mlflow.register_model(model_uri, "ChurnPredictionModel")
+
+            print("✅ Model training complete. Model saved and registered.")
 
     elif args.command == "evaluate":
         if not os.path.exists(args.model_file):
@@ -200,7 +203,7 @@ def main():
             y_pred = model.predict(X_test)
             report = classification_report(y_test, y_pred, output_dict=True)
 
-            # ✅ Log relevant numerical metrics in MLflow
+            # Log evaluation metrics
             print("🔹 Logging evaluation metrics to MLflow...")
             mlflow.log_metric("accuracy", report["accuracy"])
             mlflow.log_metric("precision_True", report["True"]["precision"])
