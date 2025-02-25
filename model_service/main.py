@@ -24,7 +24,7 @@ DEFAULT_TARGET = "Churn"
 DEFAULT_MODEL_FILE = "trained_model.joblib"
 DEFAULT_ENCODER_FILE = "encoders.pkl"
 DEFAULT_DATA_FILE = "prepared_data.pkl"  # File for saving preprocessed data
-
+mlflow.set_tracking_uri("http://localhost:5000")
 def main():
     parser = argparse.ArgumentParser(description="Machine Learning Model Pipeline")
     parser.add_argument(
@@ -161,4 +161,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
