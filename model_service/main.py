@@ -1,6 +1,6 @@
 import argparse
 import os
-import pickle
+import joblib  # Use joblib instead of pickle
 import mlflow
 import mlflow.sklearn
 import pandas as pd
@@ -124,7 +124,7 @@ def main():
         
         # Save processed data to avoid re-processing
         with open(args.data_file, "wb") as f:
-            pickle.dump((X_train, X_test, y_train, y_test), f)
+            joblib.dump((X_train, X_test, y_train, y_test), f)  # Use joblib instead of pickle
 
         save_encoders(label_encoders, args.encoder_file)
         print("✅ Data preparation complete. Encoders and processed data saved.")
@@ -136,7 +136,7 @@ def main():
             return
         
         with open(args.data_file, "rb") as f:
-            X_train, X_test, y_train, y_test = pickle.load(f)
+            X_train, X_test, y_train, y_test = joblib.load(f)  # Use joblib instead of pickle
 
         with mlflow.start_run() as run:  # Ensures run is active
             print(f"✅ MLflow Run ID: {run.info.run_id}")  # Debugging step
@@ -192,7 +192,7 @@ def main():
             return
 
         with open(args.data_file, "rb") as f:
-            X_train, X_test, y_train, y_test = pickle.load(f)
+            X_train, X_test, y_train, y_test = joblib.load(f)  # Use joblib instead of pickle
 
         with mlflow.start_run() as run:
             print(f"✅ MLflow Run ID for evaluation: {run.info.run_id}")
