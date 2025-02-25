@@ -8,4 +8,13 @@ fastapi
 uvicorn
 joblib
 flask
+pickle-mixin
 
+# Security tools
+bandit
+safety
+
+# Code quality tools
+flake8
+black
+pylint
