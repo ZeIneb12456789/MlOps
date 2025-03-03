@@ -5,7 +5,7 @@ services:
     build: ./model_service
     container_name: model_service
     ports:
-      - "5000:5000"  # Exposes port 5000 on host, change if required
+      - "5001:5001"  # Exposes port 5000 on host, change if required
     networks:
       - ml_network
     environment:
